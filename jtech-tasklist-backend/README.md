@@ -1,6 +1,6 @@
-# Todo List - Etapas 1, 2 e 3
+# Todo List - Etapas 1, 2, 3 e 4
 
-Este repositório implementa as três primeiras etapas da aplicação TODO List: Usuário (com autenticação), Pastas e Tags, com documentação via Swagger, testes e H2.
+Este repositório implementa as quatro primeiras etapas da aplicação TODO List: Usuário (com autenticação), Pastas, Tags e Tarefas, com documentação via Swagger, testes e H2.
 
 ## Decisões de arquitetura e bibliotecas
 
@@ -37,6 +37,18 @@ Outras decisões importantes:
 	- GET `/api/folders/{folderId}/tags` -> lista tags (dono ou qualquer membro)
 	- DELETE `/api/folders/{folderId}/tags/{tagId}` -> remove tag (somente dono)
 
+- Tarefas (por pasta)
+	- POST `/api/folders/{folderId}/tasks` -> cria tarefa raiz ou subtarefa (informe `parentTaskId`). Aceita `title` (obrigatório), `description`, `dueDate`, `tagIds` (vinculadas à mesma pasta). Novas tarefas começam com `completed=false`.
+	- GET `/api/folders/{folderId}/tasks` -> lista apenas tarefas raiz, cada uma já com suas subtarefas embutidas.
+	- GET `/api/folders/{folderId}/tasks/{taskId}` -> busca uma tarefa por id (com subtarefas).
+	- PUT `/api/folders/{folderId}/tasks/{taskId}` -> atualiza campos (`title`, `description`, `dueDate`, `completed`, `tagIds`).
+	- PATCH `/api/folders/{folderId}/tasks/{taskId}/completed?completed=true|false` -> marca/ desmarca conclusão.
+	- DELETE `/api/folders/{folderId}/tasks/{taskId}` -> exclui a tarefa; subtarefas são removidas em cascata.
+
+Permissões de tarefas:
+- Dono ou qualquer membro da pasta pode criar, listar, buscar, atualizar e deletar tarefas daquela pasta.
+- Validações: `tagIds` devem pertencer à mesma pasta; subtarefas devem ser da mesma pasta da tarefa pai; limite de no máximo 5 subtarefas diretas por tarefa.
+
 Swagger UI: `/swagger-ui.html`
 
 ## Configurações
@@ -57,6 +69,18 @@ Para executar a aplicação localmente (usa H2 em arquivo):
 
 - Subir app: mvn spring-boot:run
 
+### Docker
+
+Você pode rodar a API em container. O banco H2 continua em arquivo e é persistido via volume mapeado para `./build/data`.
+
+- Build da imagem e subir com Compose
+	- docker compose up --build
+
+Depois de subir:
+- API: http://localhost:8080
+- Swagger UI: http://localhost:8080/swagger-ui.html
+- H2 Console: http://localhost:8080/h2-console (JDBC URL: jdbc:h2:file:./build/data/todolist-db)
+
 ## Autenticação (BCrypt + JWT)
 
 - Senhas são hasheadas com BCrypt (`BCryptPasswordEncoder`).
@@ -70,10 +94,8 @@ Para executar a aplicação localmente (usa H2 em arquivo):
 - Testes de integração:
 	- Auth/Usuário: registro, login, acesso a endpoint protegido (401/200)
 	- Pastas: criar privada e pública, listar, join por chave, rotacionar chave, remover membro, deletar (owner vs não owner), listar membros (permissões)
-
-## Próximos passos
-
-- Etapa 4 (Tarefas): CRUD de tarefas, associar múltiplas tags, checagem/conclusão, ordenação etc.
+	- Tags: criar/listar/deletar, nome único por pasta, permissões (somente dono cria/deleta, membros podem listar)
+	- Tarefas: criar raiz e subtarefas, validar limite de 5 subtarefas diretas, vincular/desvincular tags, listar (apenas raízes com subtarefas), atualizar, marcar concluída, deletar em cascata, permissões (membros têm acesso)
 
 ## Observação sobre Java 21
 

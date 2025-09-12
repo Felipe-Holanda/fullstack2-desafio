@@ -66,6 +66,9 @@ public class TagService {
         if (!tag.getFolder().getId().equals(folderId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tag não pertence à pasta");
         }
+        // Detach from tasks via JPA relation table by clearing associations from owning side (Task.tags)
+        // Since Task is the owning side of @ManyToMany, we need to iterate tasks in the folder and remove the tag.
+        folder.getTasks().forEach(t -> t.getTags().removeIf(existing -> existing.getId().equals(tag.getId())));
         tagRepository.delete(tag);
     }
 
