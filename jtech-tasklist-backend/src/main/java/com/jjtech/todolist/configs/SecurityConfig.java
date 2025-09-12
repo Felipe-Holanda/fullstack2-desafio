@@ -27,6 +27,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // H2 Console
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .exceptionHandling(ex -> ex
+            .authenticationEntryPoint((request, response, authException) ->
+                response.sendError(org.springframework.http.HttpStatus.UNAUTHORIZED.value(), "Unauthorized"))
+            .accessDeniedHandler((request, response, accessDeniedException) ->
+                response.sendError(org.springframework.http.HttpStatus.FORBIDDEN.value(), "Access Denied"))
+        )
                 .authorizeHttpRequests(reg -> reg
                         .requestMatchers(
                                 "/api/auth/**",

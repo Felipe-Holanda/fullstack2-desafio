@@ -2,6 +2,7 @@ package com.jjtech.todolist.services;
 
 import com.jjtech.todolist.dtos.user.UserCreateRequest;
 import com.jjtech.todolist.dtos.user.UserResponse;
+import com.jjtech.todolist.dtos.folder.FolderCreateRequest;
 import com.jjtech.todolist.entities.User;
 import com.jjtech.todolist.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FolderService folderService;
 
     public UserResponse register(UserCreateRequest req) {
         userRepository.findByEmailIgnoreCase(req.getEmail())
@@ -32,6 +34,12 @@ public class UserService {
         } catch (DataIntegrityViolationException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Violação de integridade (email único)");
         }
+
+        // criar pasta padrão privada
+        FolderCreateRequest folderReq = new FolderCreateRequest();
+        folderReq.setName("Pasta Padrão");
+        folderReq.setPublic(false);
+        folderService.createFolder(user, folderReq);
 
         return toResponse(user);
     }
