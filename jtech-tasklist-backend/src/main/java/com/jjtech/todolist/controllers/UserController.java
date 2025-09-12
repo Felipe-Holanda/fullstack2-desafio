@@ -38,4 +38,12 @@ public class UserController {
     public UserResponse getById(@PathVariable Long id) {
         return userService.getById(id);
     }
+
+    @Operation(summary = "Lista dados do usuário atual (autenticado)")
+    @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = UserResponse.class)))
+    @GetMapping("/me")
+    public UserResponse getCurrentUser() {
+        return userService.getCurrentUser();
+    }
 }

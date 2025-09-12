@@ -40,6 +40,20 @@ public class FolderController {
         return folderService.listMine(me);
     }
 
+    @Operation(summary = "Listar pastas que participo (não sou dono)")
+    @GetMapping("/participating")
+    public List<FolderResponse> listParticipating() {
+        User me = currentUserService.requireCurrentUser();
+        return folderService.listParticipating(me);
+    }
+
+    @Operation(summary = "Listar todas as pastas (sou dono ou participo)")
+    @GetMapping("/all")
+    public List<FolderResponse> listAllMineAndParticipating() {
+        User me = currentUserService.requireCurrentUser();
+        return folderService.listOwnedAndParticipating(me);
+    }
+
     @Operation(summary = "Entrar em pasta pública via chave")
     @PostMapping("/join")
     public FolderResponse join(@Valid @RequestBody FolderJoinRequest req) {

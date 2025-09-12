@@ -25,7 +25,9 @@ Outras decisões importantes:
 
 - Pastas
 	- POST `/api/folders` -> cria pasta (privada ou pública). Se pública, gera `key` numérica de 8 dígitos
-	- GET `/api/folders` -> lista minhas pastas (do dono)
+	- GET `/api/folders` -> lista minhas pastas (sou dono)
+	- GET `/api/folders/participating` -> lista pastas que participo (não sou dono)
+	- GET `/api/folders/all` -> lista todas as pastas (sou dono ou participo)
 	- POST `/api/folders/join` -> entra em pasta pública via `key` (8 dígitos)
 	- POST `/api/folders/{id}/rotate-key` -> rotaciona a `key` (apenas dono; somente se pública)
 	- DELETE `/api/folders/{id}` -> remove a pasta (apenas dono)

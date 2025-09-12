@@ -21,7 +21,6 @@ public class TokenService {
 
     public TokenService(@Value("${app.security.jwt.secret}") String secret,
                         @Value("${app.security.jwt.expiration}") long expirationMs) {
-        // Accept raw or Base64; if Base64, decode; else use bytes directly
         byte[] bytes;
         try {
             bytes = Decoders.BASE64.decode(secret);

@@ -18,8 +18,8 @@ public class OpenApiConfig {
     public OpenAPI todoListOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("JTech Todo List API")
-                        .description("API para gerenciamento de usuários, pastas, tags e tarefas")
+                        .title("JTech ToDo List API")
+                        .description("API de ToDo List com autenticação JWT e suporte a pastas compartilhadas")
                         .version("v1")
                         .contact(new Contact().name("JTech").email("dev@example.com"))
                         .license(new License().name("MIT")))

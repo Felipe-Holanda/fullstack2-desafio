@@ -99,6 +99,31 @@ public class FolderService {
     }
 
     @Transactional(readOnly = true)
+    public List<FolderResponse> listParticipating(User user) {
+        return folderMemberRepository.findByUser(user).stream()
+                .map(FolderMember::getFolder)
+                .filter(f -> f != null)
+                .filter(f -> !f.getOwner().getId().equals(user.getId())) // only participating, not owned
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<FolderResponse> listOwnedAndParticipating(User user) {
+        var owned = folderRepository.findByOwner(user);
+        var participating = folderMemberRepository.findByUser(user).stream()
+                .map(FolderMember::getFolder)
+                .filter(f -> f != null)
+                .collect(Collectors.toList());
+
+        var map = new java.util.LinkedHashMap<Long, Folder>();
+        for (Folder f : owned) map.put(f.getId(), f);
+        for (Folder f : participating) map.putIfAbsent(f.getId(), f);
+
+        return map.values().stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public List<FolderMemberResponse> listMembers(User requester, Long folderId) {
     Folder folder = folderRepository.findById(folderId)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pasta não encontrada"));

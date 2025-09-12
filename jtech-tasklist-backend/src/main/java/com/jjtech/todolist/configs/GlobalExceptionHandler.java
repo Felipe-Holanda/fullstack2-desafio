@@ -19,26 +19,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidation(MethodArgumentNotValidException ex, WebRequest request) {
         Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        Map<String, String> errors = new HashMap<>();
+        StringBuilder errors = new StringBuilder();
         for (var error : ex.getBindingResult().getAllErrors()) {
-            String field;
-            if (error instanceof FieldError fe) {
-                field = fe.getField();
-            } else {
-                field = error.getObjectName();
-            }
-            errors.put(field, error.getDefaultMessage());
+            //telefone é obrigatorio 
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.append(String.format("%s: %s%n. ", fieldName, errorMessage));
         }
-        body.put("errors", errors);
+        body.put("message", errors);
         return new ResponseEntity<>(body, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Object> handleRse(ResponseStatusException ex) {
         Map<String, Object> body = new HashMap<>();
-        body.put("status", ex.getStatusCode().value());
-        body.put("error", ex.getReason());
+        body.put("message", ex.getReason());
         return new ResponseEntity<>(body, ex.getStatusCode());
     }
 }
