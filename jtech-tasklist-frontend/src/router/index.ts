@@ -1,23 +1,24 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import AuthView from '@/views/AuthView.vue'
+import DashboardView from '@/views/DashboardView.vue'
+import { getToken } from '@/lib/auth/storage'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: HomeView,
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
-    },
+  { path: '/', name: 'auth', component: AuthView },
+  { path: '/app', name: 'app', component: DashboardView },
+    { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
+})
+
+// Simple auth guard using token from storage
+router.beforeEach((to) => {
+  const token = getToken();
+  const isAuthed = !!token;
+  if (to.path === '/' && isAuthed) return '/app';
+  if (to.path.startsWith('/app') && !isAuthed) return '/';
+  return true;
 })
 
 export default router
