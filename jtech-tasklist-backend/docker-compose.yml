@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    image: jtech-todolist-api:latest
+    container_name: jtech-todolist-api
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - SERVER_PORT=8080
+      - APP_SECURITY_JWT_SECRET=aaskdjlaksdjlaskdjalsdkjalsdkjasldkjasldkjasldkajsdlaksjd-as---asdasd
+      - APP_SECURITY_JWT_EXPIRATION=3600000
+    volumes:
+      - ./build/data:/app/build/data
+    restart: unless-stopped

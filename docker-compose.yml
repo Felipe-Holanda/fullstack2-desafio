@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./jtech-tasklist-backend
+    image: jtech-todolist-api:latest
+    container_name: jtech-todolist-api
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - SERVER_PORT=8080
+      - APP_SECURITY_JWT_SECRET=super-secret-demo-value-change-me
+      - APP_SECURITY_JWT_EXPIRATION=3600000
+    ports:
+      - "8080:8080"
+    volumes:
+      - h2data:/app/build/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./jtech-tasklist-frontend
+    image: jtech-todolist-web:latest
+    container_name: jtech-todolist-web
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+    restart: unless-stopped
+
+volumes:
+  h2data:
+    driver: local
